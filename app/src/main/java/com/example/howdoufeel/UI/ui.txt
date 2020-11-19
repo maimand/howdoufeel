@@ -1,0 +1,5 @@
+trong ni tao cac activity:
+- splash screen
+- greeting screen (hoi cam xuc)
+- playsound screen
+- favorite list screen

@@ -1,0 +1,8 @@
+// class Song gom:
+attributes:
+-id
+-name
+-singer
+...
+
+(dat lam entity trong room database luon)

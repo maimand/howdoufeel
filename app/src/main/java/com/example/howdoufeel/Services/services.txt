@@ -1,0 +1,3 @@
+// tao cac class ket noi voi services
+- background services
+- api services (sentiment analysis)
