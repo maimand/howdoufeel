@@ -14,10 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.howdoufeel.Model.Song;
 import com.example.howdoufeel.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
@@ -27,44 +24,86 @@ import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
-public class HomeFragment extends Fragment{
-    private static final String CLIENT_ID = "9358ba5d9d204c348e4f4e96f6e873ab";
+public class HomeFragment extends Fragment {
+    private static final String CLIENT_ID = "44c2497a375d418db9065456518bbd4e";
     private static final String REDIRECT_URI = "com.example.howdoufeel://callback";
     private SpotifyAppRemote mSpotifyAppRemote;
+    private final String[] GOOD_MOOD = {"playlist:37i9dQZF1DX3rxVfibe1L0", // mood booster
+                                        "playlist/37i9dQZF1DXdPec7aLTmlC", // happy songs
+                                        "playlist/5s8Fc6myVaFFWkRH73k62g"};// happy hits
 
+    private final String[] BAD_MOOD = {"playlist:37i9dQZF1DX3rxVfibe1L0", // mood booster
+                                        "playlist:1nVWPImtwYUYdvCTPHTtpJ", // sad lofi
+                                        "playlist:37i9dQZF1DX64Y3du11rR1"};// sad covers
+    private String mood;
     private boolean isPause = false;
     private String songURI = "", songImageURI, songName, songArtists;
     private long songLength;
-
     private ImageView play_pause, next, pre, shuffle, repeat;
     private TextView name, artist, songProgress, songDuration;
     private ImageView image;
+    private String playlist;
+    private boolean isStreaming;
 
     private SeekBar seekBar;
+    private PlayingModel model;
 
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
         return root;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isStreaming", isStreaming);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         bindingView(view);
         setSeekBar(view);
+        Bundle bundle = getArguments();
+        if(bundle != null){
+            mood = bundle.getString("mood");
+        }else{
+            mood = "happy";
+        }
+        if(savedInstanceState!=null){
+            isStreaming = savedInstanceState.getBoolean("isStreaming");
+            Log.e("no","no");
+        }else {
+            isStreaming = false;
+        }
     }
+//    public void saveData(String mood, String playlist, boolean isStreaming) {
+//        SharedPreferences sharedPreferences = getContext().getSharedPreferences("namesharedPrefs", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("mood", mood);
+//        editor.putString("playlist", playlist);
+//        editor.putBoolean("isStreaming", isStreaming);
+//        editor.apply();
+//    }
+//    public void loadData() {
+//        SharedPreferences namesharedPrefs = getContext().getSharedPreferences("namesharedPrefs", MODE_PRIVATE);
+//        mood = namesharedPrefs.getString("mood", "happy");
+//        playlist = namesharedPrefs.getString("playlist", "");
+//        isStreaming = namesharedPrefs.getBoolean("isStreaming", false);
+//    }
 
     @Override
     public void onStart() {
         super.onStart();
+        Log.e("stream?", isStreaming?"yes":"0");
         ConnectionParams connectionParams =
                 new ConnectionParams.Builder(CLIENT_ID)
                         .setRedirectUri(REDIRECT_URI)
@@ -76,15 +115,17 @@ public class HomeFragment extends Fragment{
 
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         mSpotifyAppRemote = spotifyAppRemote;
-                        Log.d("MainActivity", "Connected! Yay!");
 
+                        Log.e("stream?", isStreaming?"yes":"0");
+
+                        if(!isStreaming){
+                            connected();
+                        }
                         // Now you can start interacting with App Remote
-                        connected();
-
                     }
 
                     public void onFailure(Throwable throwable) {
-                        Log.e("errorConnect", throwable.getMessage(), throwable);
+                        Log.e("MyActivity", throwable.getMessage(), throwable);
 
                         // Something went wrong when attempting to connect! Handle errors here
                     }
@@ -92,24 +133,36 @@ public class HomeFragment extends Fragment{
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
+//        saveData("","", false);
         SpotifyAppRemote.disconnect(mSpotifyAppRemote);
     }
 
     private void connected() {
+        isStreaming = true;
         // Play a playlist
-        mSpotifyAppRemote.getPlayerApi().play("spotify:artist:5dfZ5uSmzR7VQK0udbAVpf");
+        if(mood.equals("happy")){
+            playlist = getRandom(GOOD_MOOD);
+        }else{
+            playlist = getRandom(BAD_MOOD);
+        }
+        mSpotifyAppRemote.getPlayerApi().play("spotify:" + playlist);
         UpdateSongTime.run();
+//
 
+        // Subscribe to PlayerState
         mSpotifyAppRemote.getPlayerApi()
                 .subscribeToPlayerState()
                 .setEventCallback(new Subscription.EventCallback<PlayerState>() {
                     @Override
                     public void onEvent(PlayerState playerState) {
-                        Log.d("position", "" + playerState.playbackPosition);
                         final Track track = playerState.track;
-                        Log.d("trackinfo", track.uri);
                         if (track != null) {
                             if (isChangeSong(track.uri)) {
                                 seekBar.setProgress(0);
@@ -123,7 +176,10 @@ public class HomeFragment extends Fragment{
                     }
                 });
     }
-
+    public static String getRandom(String[] array) {
+        int rnd = new Random().nextInt(array.length);
+        return array[rnd];
+    }
     public void updateTrackInfo(Track track){
         songLength = track.duration;
         songName = track.name;
@@ -249,4 +305,5 @@ public class HomeFragment extends Fragment{
                     });
         }
     };
+
 }
