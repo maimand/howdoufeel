@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
     class GetEmotion extends AsyncTask<Void, Void, String> {
 
         private Bitmap bitmap;
-        private final String BASE_URL="http://9b423b4f5915.ngrok.io";
+        private final String BASE_URL="http://b07af146b7cd.ngrok.io";
 
         public GetEmotion(Bitmap bitmap)
         {
