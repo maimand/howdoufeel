@@ -16,13 +16,18 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.room.Room;
 
+import com.example.howdoufeel.Database.AppDatabase;
+import com.example.howdoufeel.Database.SongsDao;
+import com.example.howdoufeel.Model.Song;
 import com.example.howdoufeel.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -61,7 +66,18 @@ public class MainActivity extends AppCompatActivity {
 //                startActivity(intent);
             }
         });
-
+        //KhangTest
+//        AppDatabase database = Room.databaseBuilder(this, AppDatabase.class, "Song")
+//                .allowMainThreadQueries()
+//                .build();
+//        SongsDao songsdao = database.getSongsDao();
+//        Song song = new Song("Co chac yeu la day", "12323","https://media.travelmag.vn/files/thanhhuyen/2020/07/28/son-tung-mtp-lo-anh-dung-do-doi-voi-thieu-bao-tram-9-15848102443021860636400-1717.jpg","Son Tung","abc");
+//        songsdao.addSong(song);
+//        song.setImageUri("https://image.thanhnien.vn/768/uploaded/haoph/2020_02_07/jack01_gtpf.jpg");
+//        songsdao.addSong(song);
+//        List<Song> songs = songsdao.getAllSong();
+//        Log.d("TAG", "onCreate: " +songs);
+//        System.out.println(songs);
     }
 
     @Override
