@@ -1,66 +1,99 @@
 package com.example.howdoufeel.Model;
 
-import android.graphics.Bitmap;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+@Entity
 public class Song {
+    @NonNull
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    private int id;
+
+    @NonNull
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @ColumnInfo(name = "songId")
+    private String songId;
+
+    @ColumnInfo(name = "name")
     private String name;
-    private String id;
-    private String imageuri;
+
+    @ColumnInfo(name = "imageUri")
+    private String imageUri;
+
+    @ColumnInfo(name="artists")
     private String artists;
+
+    @ColumnInfo(name="playlist")
     private String playlist;
+
+    @ColumnInfo(name="isFavorite")
     private boolean isFavorite;
 
-    public Song(String name, String id, String imageuri, String artists, String playlist) {
+    public Song(){
+
+    }
+
+    public Song(String name,@NonNull String id, String imageUri, String artists, String playlist) {
         this.name = name;
-        this.id = id;
-        this.imageuri = imageuri;
+        this.songId = id;
+        this.imageUri = imageUri;
         this.artists = artists;
         this.playlist = playlist;
         this.isFavorite = false;
+    }
+
+    public String getSongId() {
+        return songId;
+    }
+
+    public void setSongId(String songId) {
+        this.songId = songId;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getId() {
-        return id;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getImage() {
-        return imageuri;
+    public String getImageUri() {
+        return imageUri;
+    }
+
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
     }
 
     public String getArtists() {
         return artists;
     }
 
-    public String getPlaylist() {
-        return playlist;
-    }
-
-    public boolean isFavorite() {
-        return isFavorite;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setImage(String imageuri) {
-        this.imageuri = imageuri;
-    }
-
     public void setArtists(String artists) {
         this.artists = artists;
     }
 
+    public String getPlaylist() {
+        return playlist;
+    }
+
     public void setPlaylist(String playlist) {
         this.playlist = playlist;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
     }
 
     public void setFavorite(boolean favorite) {
